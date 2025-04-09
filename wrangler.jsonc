@@ -2,6 +2,6 @@
     "name": "hello-claudflare",
     "compatibility_date": "2025-04-09",
     "assets": {
-      "directory": "./.svelte-kit/output"
+      "directory": "./.svelte-kit/cloudflare"
     }
   }
