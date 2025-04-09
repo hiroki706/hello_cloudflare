@@ -1,7 +1,17 @@
 <script lang="ts">
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
+	import { enhance } from '$app/forms';
+	import type { PageProps } from './$types';
+	import type { SubmitFunction } from './$types';
+
+	const option: SubmitFunction = () => {
+		loading = true;
+		return async ({ update }) => {
+			await update();
+			loading = false;
+		};
+	};
+	let { data, form }: PageProps = $props();
+	let loading = $state(false);
 </script>
 
 <svelte:head>
@@ -9,51 +19,36 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
-		</span>
+<h1>ハローワールド!</h1>
+<form method="POST" use:enhance={option} action="?/runCode">
+	<label>
+		入力
+		<input type="text" name="input" disabled={true} value="Hello" />
+	</label>
+	<label>
+		code
+		<input type="text" name="code" disabled={loading} />
+	</label>
+	<button disabled={loading}>Push Me!</button>
+	{#if form?.codeEmpty}
+		<p class="formErr">Code欄は空でない必要があります</p>
+	{/if}
+	{#if form?.inputEmpty}
+		<p class="formErr">Input欄は空でない必要があります</p>
+	{/if}
+</form>
 
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
+{#if loading}
+	<p>Loading...</p>
+{/if}
+{#if form?.success}
+	<p>{data.loadtest}</p>
+	<h4>{form?.data?.result}</h4>
+	<p>{form?.data?.stdout}</p>
+{/if}
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	.formErr {
+		color: red;
 	}
 </style>
